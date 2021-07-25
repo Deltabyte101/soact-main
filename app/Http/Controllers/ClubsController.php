@@ -1,0 +1,159 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Clubs;
+use App\Models\User;
+use app\image;
+use Exception;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+
+class ClubsController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        $clubs = Clubs::all();
+        return view('clubs.clubs',['clubs'=>$clubs]);
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        $club = new Clubs();
+        $club->name = $request->name;
+        $club->description = $request->description;
+        $club->facebook = $request->facebook;
+        $club->phone = $request->phone;
+        $club->faction = $request->faction;
+        $club->vdo = $request->vdo;
+
+        /*
+        if($request->picture)
+        {
+            try
+            {
+                $filePath = $this->UserImageUpload($request->picture);
+                $club->picture = $filePath ;
+            }
+            catch(Exception $e)
+            {
+                $error = $e ;
+            }
+        }3
+        $club->picture = $request->picture;
+        */
+        $club->picture = Storage::disk('public')->put('logo.jpg',$request->picture);
+        $club->QR = Storage::disk('public')->put('qrCode.jpg',$request->QR);
+        //$club->picture = $request->file('picture.jpg')->store('profile');
+
+        $error = [];
+        if($club->save()){
+            $error = [1,'บันทึกชมรมสำเร็จ'];
+        }else{
+            $error = [0,'เกิดข้อผิดพลาดบางอย่าง โปรดติดต่อแอดมิน'];
+        }
+        return redirect()->route('clubs.index')->with(['result'=>$error[0],'text'=>$error[1]]);
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\Models\Clubs  $clubs
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        //
+        $club = Clubs::find($id);
+
+        return view('clubs.edit-clubs',['club'=>$club]);
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  \App\Models\Clubs  $clubs
+     * @return \Illuminate\Http\Response
+     */
+    public function edit(Clubs $clubs)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Clubs  $clubs
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+        //
+        // dd($request->exists(['open']));
+        // dd($request->open);
+        $club = Clubs::find($id);
+        $club->name = $request->name ?? $club->name;
+        $club->description = $request->description ?? $club->description;
+        $club->facebook = $request->facebook ?? $club->facebook ;
+        $club->phone = $request->phone ?? $club->phone;
+        $club->vdo = $request->vdo ?? $club->vdo ;
+        $club->faction = $request->faction ?? $club->faction ;
+        $club->open = $request->has('open');
+
+        //$club->picture = $club->picture ?? Storage::disk('public')->put('logo.jpg',$request->picture);
+        //$club->QR = $club->QE ?? Storage::disk('public')->put('qrCode.jpg',$request->QR);
+        // dd($club);
+        // dd($request->has('open'));
+        if($club->update()){
+            $error = [1,'แก้ไขรมสำเร็จ'];
+        }else{
+            $error = [0,'เกิดข้อผิดพลาดบางอย่าง โปรดติดต่อแอดมิน'];
+        }
+
+        if($request->refresh){
+            return redirect()->route('question.index');
+        }
+        return redirect()->route('clubs.index')->with(['result'=>$error[0],'text'=>$error[1]]);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\Clubs  $clubs
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        //
+
+        if(Clubs::find($id)->delete()){
+            $error = [1,'ลบชมรมสำเร็จ'];
+        }else{
+            $error = [0,'เกิดข้อผิดพลาดบางอย่าง โปรดติดต่อแอดมิน'];
+        }
+        return redirect()->route('clubs.index')->with(['result'=>$error[0],'text'=>$error[1]]);
+    }
+}
