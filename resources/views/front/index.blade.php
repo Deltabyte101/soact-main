@@ -31,7 +31,7 @@
                                 height:170px
                                 width:auto;/*maintain aspect ratio*/
                                 max-width:500px;-->
-                                <img class="card-img-top" style="width:auto;height:auto;" src="{{ Storage::url( $data->picture) }}"  " alt="..." />
+                                <img class="card-img-top" style="width:auto;height:auto;" src="{{ Storage::url( $data->picture) }}"   alt="..." />
                                 <!-- Product details-->
                                 <div class="card-body p-4">
                                     <div class="text-center">

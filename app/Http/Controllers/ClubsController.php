@@ -48,25 +48,8 @@ class ClubsController extends Controller
         $club->phone = $request->phone;
         $club->faction = $request->faction;
         $club->vdo = $request->vdo;
-
-        /*
-        if($request->picture)
-        {
-            try
-            {
-                $filePath = $this->UserImageUpload($request->picture);
-                $club->picture = $filePath ;
-            }
-            catch(Exception $e)
-            {
-                $error = $e ;
-            }
-        }3
-        $club->picture = $request->picture;
-        */
         $club->picture = Storage::disk('public')->put('logo.jpg',$request->picture);
         $club->QR = Storage::disk('public')->put('qrCode.jpg',$request->QR);
-        //$club->picture = $request->file('picture.jpg')->store('profile');
 
         $error = [];
         if($club->save()){
